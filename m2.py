@@ -101,9 +101,22 @@ def p_error(p):
 
 lexer = lex.lex()
 yacc = yacc.yacc(start='body')
-try:
-    res = yacc.parse("if (((a[1] < b) || b)) {}", debug=False)
-except Exception as  e:
-    pass
-else:
-    print("Valid string")
+def validate_str(s):
+    try:
+        res = yacc.parse(s, debug=False)
+    except Exception as  e:
+        pass
+    else:
+        print("Valid string")
+
+
+def main():
+    while (1):
+        buf = input()
+        if (buf == "quit"):
+            return
+        print(buf)
+        validate_str(buf)
+
+main()
+

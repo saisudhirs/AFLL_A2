@@ -8,24 +8,31 @@ tokens = keywords +  (
     'CIC',
     'CUO',
     'CUC',
+    'SQO',
+    'SQC',
+    'STR',
     'NUM',
     'COMMA',
     'SP',
     'VAR',
-    'LOG'
+    'LOG',
+    'DOT'
 )
 
 t_IF = r'if'
 t_ELSE = r'else'
 
-t_NUM = r'([0-9]*\.[0-9]*)|([0-9]+)'
+t_NUM = r'([0-9]+\.[0-9]*)|([0-9]+)'
 t_CIO = r'\('
 t_CIC = r'\)'
 t_CUO = r'\{'
 t_CUC = r'\}'
+t_SQO = r'\['
+t_SQC = r'\]'
+t_STR = r'(\'.+\')|(\".+\")'
 t_COMMA = r'\,'
 t_LOG = r'&&|\|\||<|>|<=|>=|==|!='
-
+t_DOT = r'\.'
 
 def t_VAR(s):
     r'[a-zA-Z][a-zA-Z0-9]*'
@@ -48,28 +55,35 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
+
 def p_expr(p):
     """expr : NUM
     | VAR
-    | func"""
+    | func
+    | STR
+    | dotaccess
+    | arridx"""
 
 def p_args(p):
     """args : expr
     | expr COMMA args"""
 
+def p_arridx(p):
+    """arridx : expr SQO expr SQC"""
+
+def p_dotaccess(p):
+    """dotaccess : expr DOT VAR"""
+
 def p_func(p):
     """func : VAR CIO args  CIC"""
-    p[0] = p[1]
 
 def p_term(p):
     """term : expr LOG expr 
     | expr
     | CIO term CIC"""
-    p[0] = ''
 
 def p_if(p):
     """if : IF CIO term CIC CUO body CUC"""
-    p[0] = p[3]
 
 def p_ifelse(p):
     """ifelse : if ELSE CUO body CUC"""
@@ -80,12 +94,15 @@ def p_empty(p):
 
 def p_error(p):
     print("Syntax error at ", p)
+    raise(SyntaxError())
     pass
 
 
 lexer = lex.lex()
 yacc = yacc.yacc(start='body')
 try:
-    res = yacc.parse("if (f(g(x), 1) && 1) {}", debug=False)
+    res = yacc.parse("if x[\"hi\"].foo) {}", debug=False)
 except Exception as  e:
-    print("Syntax Error")
+    pass
+else:
+    print("Valid string")

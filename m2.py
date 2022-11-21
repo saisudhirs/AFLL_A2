@@ -31,7 +31,7 @@ t_SQO = r'\['
 t_SQC = r'\]'
 t_STR = r'(\'.+\')|(\".+\")'
 t_COMMA = r'\,'
-t_LOG = r'&&|\|\||<|>|<=|>=|==|!='
+t_LOG = r'&&|\|\||\<\=|>=|<|>|==|!='
 t_DOT = r'\.'
 
 def t_VAR(s):
@@ -66,7 +66,8 @@ def p_expr(p):
 
 def p_args(p):
     """args : expr
-    | expr COMMA args"""
+    | expr COMMA args
+    | empty"""
 
 def p_arridx(p):
     """arridx : expr SQO expr SQC"""
@@ -75,10 +76,10 @@ def p_dotaccess(p):
     """dotaccess : expr DOT VAR"""
 
 def p_func(p):
-    """func : VAR CIO args  CIC"""
+    """func : expr CIO args CIC"""
 
 def p_term(p):
-    """term : expr LOG expr 
+    """term : term LOG term
     | expr
     | CIO term CIC"""
 
@@ -101,7 +102,7 @@ def p_error(p):
 lexer = lex.lex()
 yacc = yacc.yacc(start='body')
 try:
-    res = yacc.parse("if x[\"hi\"].foo) {}", debug=False)
+    res = yacc.parse("if (((a[1] < b) || b)) {}", debug=False)
 except Exception as  e:
     pass
 else:

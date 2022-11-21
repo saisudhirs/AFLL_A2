@@ -39,8 +39,13 @@ if (x.y) {}
 ```
 
 ```typescript
+if (f(x)) {} 
+```
+
+```typescript
 if ((x.y && y[z]) || 10) {}
 ```
+
 ```typescript
 if (x) {} else {}
 ```
